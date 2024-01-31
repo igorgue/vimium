@@ -41,17 +41,13 @@ const scrollProperties = {
   },
 };
 
-const isString = function(obj) {
-  return (typeof obj === "string") || obj instanceof String;
-}
-
 // Translate a scroll request into a number (which will be interpreted by `scrollBy` as a relative
 // amount, or by `scrollTo` as an absolute amount). :direction must be "x" or "y". :amount may be
 // either a number (in which case it is simply returned) or a string. If :amount is a string, then
 // it is either "max" (meaning the height or width of element), or "viewSize". In both cases, we
 // look up and return the requested amount, either in `element` or in `window`, as appropriate.
 const getDimension = function (el, direction, amount) {
-  if (isString(amount)) {
+  if (Utils.isString(amount)) {
     const name = amount;
     // the clientSizes of the body are the dimensions of the entire page, but the viewport should
     // only be the part visible through the window
@@ -340,7 +336,7 @@ const Scroller = {
   init() {
     const handler = { _name: "scroller/active-element" };
     // Only Chrome has a DOMActivate event. On Firefox, we must listen for click. See #3287.
-    const eventName = "DOMActivate";
+    const eventName = Utils.isFirefox() ? "click" : "DOMActivate";
     handler[eventName] = (event) =>
       handlerStack.alwaysContinueBubbling(function () {
         // If event.path is present, the true event taget (potentially inside a Shadow DOM inside
