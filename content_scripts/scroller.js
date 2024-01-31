@@ -41,13 +41,17 @@ const scrollProperties = {
   },
 };
 
+const isString = function(obj) {
+  return (typeof obj === "string") || obj instanceof String;
+}
+
 // Translate a scroll request into a number (which will be interpreted by `scrollBy` as a relative
 // amount, or by `scrollTo` as an absolute amount). :direction must be "x" or "y". :amount may be
 // either a number (in which case it is simply returned) or a string. If :amount is a string, then
 // it is either "max" (meaning the height or width of element), or "viewSize". In both cases, we
 // look up and return the requested amount, either in `element` or in `window`, as appropriate.
 const getDimension = function (el, direction, amount) {
-  if (Utils.isString(amount)) {
+  if (isString(amount)) {
     const name = amount;
     // the clientSizes of the body are the dimensions of the entire page, but the viewport should
     // only be the part visible through the window
@@ -222,7 +226,8 @@ const CoreScroller = {
 
   // Return true if CoreScroller would not initiate a new scroll right now.
   wouldNotInitiateScroll() {
-    return this.lastEvent && this.lastEvent.repeat && Settings.get("smoothScroll");
+    // return this.lastEvent && this.lastEvent.repeat && Settings.get("smoothScroll");
+    return this.lastEvent && this.lastEvent.repeat;
   },
 
   // Calibration fudge factors for continuous scrolling. The calibration value starts at 1.0. We
@@ -244,12 +249,12 @@ const CoreScroller = {
       return;
     }
 
-    if (!Settings.get("smoothScroll")) {
-      // Jump scrolling.
-      performScroll(element, direction, amount);
-      checkVisibility(element);
-      return;
-    }
+    // if (!Settings.get("smoothScroll")) {
+    //   // Jump scrolling.
+    //   performScroll(element, direction, amount);
+    //   checkVisibility(element);
+    //   return;
+    // }
 
     // We don't activate new animators on keyboard repeats; rather, the most-recently activated
     // animator continues scrolling.
@@ -335,7 +340,7 @@ const Scroller = {
   init() {
     const handler = { _name: "scroller/active-element" };
     // Only Chrome has a DOMActivate event. On Firefox, we must listen for click. See #3287.
-    const eventName = Utils.isFirefox() ? "click" : "DOMActivate";
+    const eventName = "DOMActivate";
     handler[eventName] = (event) =>
       handlerStack.alwaysContinueBubbling(function () {
         // If event.path is present, the true event taget (potentially inside a Shadow DOM inside
